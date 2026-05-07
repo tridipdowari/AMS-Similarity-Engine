@@ -1,29 +1,32 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+
+from app.models import ProposalInput
 from app.engine import search_similar
 
 app = FastAPI()
 
 
-class ProposalInput(BaseModel):
-    title: str = ""
-    description: str = ""
-    objectives: str = ""
-    methodology: str = ""
-
-
 @app.get("/")
 def home():
-    return {"message": "Similarity Engine Running"}
+    return {"message": "AMS Similarity Engine Running"}
 
 
 @app.post("/search")
-def search(data: ProposalInput):
-    query = f"""
-    {data.title} {data.title}
-    {data.description}
-    {data.objectives}
-    {data.methodology}
+def search(proposal: ProposalInput):
+
+    # Combine proposal fields into one semantic query
+    query_text = f"""
+    {proposal.title}
+    {proposal.description}
+    {proposal.objectives}
+    {proposal.methodology}
     """
 
-    return search_similar(query)
+    # Run similarity search
+    results = search_similar(query_text)
+
+    return {
+        "query": proposal.title,
+        "total_matches": len(results),
+        "results": results
+    }

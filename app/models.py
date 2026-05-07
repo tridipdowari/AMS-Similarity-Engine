@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 
-class SearchRequest(BaseModel):
-    query: str
-    top_k: int = 3
+
+class ProposalInput(BaseModel):
+    title: str = ""
+    description: str = ""
+    objectives: str = ""
+    methodology: str = ""
