@@ -17,16 +17,17 @@ def search(proposal: ProposalInput):
     # Combine proposal fields into one semantic query
     query_text = f"""
     {proposal.title}
-    {proposal.description}
-    {proposal.objectives}
-    {proposal.methodology}
+    {proposal.introduction}
+    {proposal.actionPlan}
+    {proposal.expectedOutcome}
+    {' '.join(proposal.objectives)}
     """
 
     # Run similarity search
     results = search_similar(query_text)
 
     return {
-        "query": proposal.title,
+        "query_title": proposal.title,
         "total_matches": len(results),
         "results": results
     }

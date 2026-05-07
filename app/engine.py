@@ -12,6 +12,8 @@ documents = get_documents()
 
 # Extract proposal texts
 proposal_texts = [doc["text"] for doc in documents]
+if not proposal_texts:
+    raise ValueError("No proposals found in MongoDB collection")
 
 # Generate embeddings
 doc_embeddings = model.encode(proposal_texts)
@@ -44,7 +46,9 @@ def search_similar(query_text: str, top_k: int = 3):
     faiss.normalize_L2(query_vector)
 
     # Search similar vectors
-    scores, indices = index.search(query_vector, top_k)
+    actual_k = min(top_k, len(documents))
+
+    scores, indices = index.search(query_vector, actual_k)
 
     results = []
 
