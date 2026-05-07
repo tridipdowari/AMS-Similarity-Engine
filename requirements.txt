@@ -25,6 +25,7 @@ pillow==11.3.0
 pydantic==2.13.3
 pydantic_core==2.46.3
 pymongo==4.17.0
+python-dotenv==1.2.1
 PyYAML==6.0.3
 regex==2026.1.15
 requests==2.32.5

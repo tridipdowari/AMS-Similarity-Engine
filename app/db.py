@@ -1,9 +1,18 @@
+import os
+
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
-MONGO_URI = "mongodb+srv://AMS-DB-USER:AMS-123@cluster0.qkrtn8a.mongodb.net"
+# Load environment variables
+load_dotenv()
 
+# Get Mongo URI from .env
+MONGO_URI = os.getenv("MONGO_URI")
+
+# MongoDB connection
 client = MongoClient(MONGO_URI)
 
+# Database and collection
 db = client["test"]
 
 collection = db["projects"]
