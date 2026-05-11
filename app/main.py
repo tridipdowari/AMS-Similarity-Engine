@@ -14,6 +14,8 @@ def home():
 @app.post("/search")
 def search(proposal: ProposalInput):
 
+    print(proposal.model_dump())
+
     # Combine proposal fields into one semantic query
     query_text = f"""
     {proposal.title}
