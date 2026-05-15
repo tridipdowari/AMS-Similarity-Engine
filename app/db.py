@@ -13,6 +13,6 @@ MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 
 # Database and collection
-db = client["test"]
+db = client["test2"]
 
 collection = db["projects"]
