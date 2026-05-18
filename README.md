@@ -7,6 +7,7 @@ AMS Similarity Engine is a semantic proposal similarity detection system built u
 * FastAPI
 * Sentence Transformers
 * FAISS
+* Qdrant
 * MongoDB
 
 The system compares incoming project proposals with existing proposals stored in MongoDB and returns semantically similar matches using vector embeddings.
@@ -15,25 +16,29 @@ The system compares incoming project proposals with existing proposals stored in
 
 # Features
 
-* Semantic similarity search
-* MongoDB integration
-* FAISS vector indexing
-* REST API using FastAPI
+* Semantic proposal similarity detection
+* SentenceTransformer embedding generation
+* Qdrant vector database integration
+* FAISS cosine similarity retrieval
+* MongoDB proposal storage
+* Automatic vector synchronization recovery
 * Real-time proposal comparison
-* Similarity score classification
+* Threshold-based similarity classification
+* FastAPI REST API
 
 ---
 
 # Tech Stack
 
-| Technology            | Purpose                  |
-| --------------------- | ------------------------ |
-| FastAPI               | Backend API              |
-| Sentence Transformers | Text embeddings          |
-| FAISS                 | Vector similarity search |
-| MongoDB               | Proposal storage         |
-| PyMongo               | MongoDB connection       |
-| Uvicorn               | FastAPI server           |
+| Technology            | Purpose                   |
+| --------------------- | ------------------------- |
+| FastAPI               | Backend API               |
+| Sentence Transformers | Text embeddings           |
+| FAISS                 | Vector similarity search  |
+| MongoDB               | Proposal storage          |
+| PyMongo               | MongoDB connection        |
+| Uvicorn               | FastAPI server            |
+| Qdrant                |Persistent vector database |
 
 ---
 
@@ -58,13 +63,15 @@ AMS-Similarity-Engine/
 
 # Workflow
 
-1. Existing proposals are stored in MongoDB.
-2. Similarity engine fetches proposal data from MongoDB.
-3. Semantic embeddings are generated using SentenceTransformer.
-4. FAISS creates vector indexes for fast similarity search.
-5. Backend sends a new proposal to the `/search` API route.
-6. Similarity engine compares the new proposal with existing proposals.
-7. Similarity scores and matched proposals are returned.
+1. Proposals are stored in MongoDB.
+2. Proposal text fields are combined into a single semantic document.
+3. SentenceTransformer generates dense vector embeddings.
+4. Embeddings are stored in Qdrant vector database.
+5. Existing vectors are loaded into FAISS for fast cosine similarity retrieval.
+6. Incoming proposals are converted into embeddings during API requests.
+7. FAISS performs semantic similarity search against existing proposal vectors.
+8. Similarity scores are classified as HIGH, MEDIUM, or LOW.
+9. If Qdrant vectors become inconsistent with MongoDB, the engine automatically rebuilds vectors during startup synchronization.
 
 ---
 
@@ -203,37 +210,34 @@ POST /search
 
 ---
 
-# Similarity Classification
-
-| Score Range | Status |
-| ----------- | ------ |
-| 80+         | HIGH   |
-| 50 - 79     | MEDIUM |
-| Below 50    | LOW    |
-
----
-
 # How Similarity Works
 
-The system uses SentenceTransformer embeddings to convert proposal text into dense vectors.
+The system uses SentenceTransformer embeddings to convert proposal content into dense semantic vectors.
 
-FAISS performs cosine similarity search between:
+Cosine similarity is used to measure semantic overlap between:
+- incoming proposals
+- existing proposal vectors
 
-* Incoming proposal embedding
-* Existing proposal embeddings
+FAISS performs high-speed nearest-neighbor retrieval while Qdrant stores persistent vector embeddings.
 
-The most semantically similar proposals are returned with similarity scores.
+The similarity engine classifies proposals using threshold-based semantic similarity rules:
+
+| Score | Classification |
+|-------|----------------|
+| ≥ 80  | HIGH           |
+| 50–79 | MEDIUM         |
+| < 50  | LOW            |
 
 ---
 
 # Future Improvements
 
-* Persistent FAISS index storage
-* Incremental vector updates
-* Hybrid semantic + keyword search
-* Async indexing pipeline
-* Better ranking algorithms
-* Proposal exclusion logic
+* Distributed vector scaling
+* Advanced proposal ranking
+* Hybrid semantic + keyword retrieval
+* Proposal deletion synchronization
+* Fine-tuned domain-specific embedding models
+* Authentication and access control
 
 ---
 
