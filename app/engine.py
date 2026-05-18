@@ -124,7 +124,7 @@ if mongo_count != qdrant_count:
 
         payload = {
 
-            "id": doc.get("id"),
+            "id": str(doc.get("_id")),
 
             "title": doc.get("title", ""),
 
