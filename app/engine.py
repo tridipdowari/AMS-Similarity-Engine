@@ -14,6 +14,7 @@ from qdrant_client.models import (
 )
 
 from app.data import get_documents
+from app.db import collection
 
 load_dotenv()
 
@@ -22,7 +23,8 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 client = QdrantClient(
     url=QDRANT_URL,
-    api_key=QDRANT_API_KEY
+    api_key=QDRANT_API_KEY,
+    timeout=60
 )
 
 COLLECTION_NAME = "research_proposals"
@@ -68,12 +70,29 @@ def generate_embedding(text):
 
 documents = get_documents()
 
-existing_points = client.count(
+mongo_count = collection.count_documents({})
+
+qdrant_count = client.count(
     collection_name=COLLECTION_NAME,
     exact=True
 ).count
 
-if existing_points == 0:
+print("Mongo Count:", mongo_count)
+print("Qdrant Count:", qdrant_count)
+
+if mongo_count != qdrant_count:
+
+    print("MongoDB and Qdrant out of sync. Rebuilding vectors...")
+
+    client.delete_collection(COLLECTION_NAME)
+
+    client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(
+            size=384,
+            distance=Distance.COSINE
+        )
+    )
 
     print("Uploading documents to Qdrant...")
 
@@ -105,7 +124,7 @@ if existing_points == 0:
 
         payload = {
 
-            "id": doc.get("id"),
+            "id": str(doc.get("_id")),
 
             "title": doc.get("title", ""),
 
@@ -128,16 +147,26 @@ if existing_points == 0:
             )
         )
 
-    client.upsert(
-        collection_name=COLLECTION_NAME,
-        points=points
-    )
+    BATCH_SIZE = 5
+
+    for i in range(0, len(points), BATCH_SIZE):
+
+        batch = points[i:i + BATCH_SIZE]
+
+        client.upsert(
+            collection_name=COLLECTION_NAME,
+            points=batch
+        )
 
     print("Documents uploaded to Qdrant.")
 
 # =========================
 # LOAD EXISTING QDRANT DATA INTO FAISS
 # =========================
+
+faiss_index.reset()
+
+faiss_id_map.clear()
 
 stored_points = client.scroll(
     collection_name=COLLECTION_NAME,
@@ -284,7 +313,7 @@ def add_document(new_doc):
     faiss_index.add(vector)
 
     faiss_id_map.append({
-        "id": new_doc.get("id"),
+        "id": str(new_doc.get("_id", new_doc.get("id"))),
         "title": new_doc.get("title", ""),
         "discipline": new_doc.get("discipline", "").strip().lower(),
         "introduction": new_doc.get("introduction", ""),
