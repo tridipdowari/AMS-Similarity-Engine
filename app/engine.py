@@ -160,9 +160,9 @@ if mongo_count != qdrant_count:
 
     print("Documents uploaded to Qdrant.")
 
-# =========================
+# ====================================
 # LOAD EXISTING QDRANT DATA INTO FAISS
-# =========================
+# ====================================
 
 faiss_index.reset()
 
