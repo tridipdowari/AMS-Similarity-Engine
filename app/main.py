@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.models import ProposalInput
-from app.engine import search_similar
+from app.engine import search_similar, add_document
 
 app = FastAPI()
 
@@ -14,19 +14,25 @@ def home():
 @app.post("/search")
 def search(proposal: ProposalInput):
 
-    print(proposal.model_dump())
-
-    # Combine proposal fields into one semantic query
-    query_text = f"""
-    {proposal.title}
-    {proposal.introduction}
-    {proposal.actionPlan}
-    {proposal.expectedOutcome}
-    {' '.join(proposal.objectives)}
-    """
-
     # Run similarity search
-    results = search_similar(query_text)
+    results = search_similar({
+        "title": proposal.title,
+        "discipline": proposal.discipline,
+        "introduction": proposal.introduction,
+        "actionPlan": proposal.actionPlan,
+        "expectedOutcome": proposal.expectedOutcome,
+        "objectives": proposal.objectives
+    })
+
+    add_document({
+        "id": abs(hash(proposal.title)),
+        "title": proposal.title,
+        "discipline": proposal.discipline,
+        "introduction": proposal.introduction,
+        "actionPlan": proposal.actionPlan,
+        "expectedOutcome": proposal.expectedOutcome,
+        "objectives": proposal.objectives
+    })
 
     return {
         "query_title": proposal.title,

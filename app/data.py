@@ -9,20 +9,20 @@ def get_documents():
 
     for d in docs:
 
-        objectives = d.get("objectives", [])
-
-        text = f"""
-        {d.get("title", "")}
-        {d.get("introduction", "")}
-        {d.get("actionPlan", "")}
-        {d.get("expectedOutcome", "")}
-        {' '.join(map(str, objectives))}
-        """
-
         documents.append({
             "id": str(d.get("_id")),
+
             "title": d.get("title", ""),
-            "text": text.strip()
+
+            "discipline": d.get("discipline", ""),
+
+            "introduction": d.get("introduction", ""),
+
+            "actionPlan": d.get("actionPlan", ""),
+
+            "expectedOutcome": d.get("expectedOutcome", ""),
+
+            "objectives": d.get("objectives", [])
         })
 
     return documents
