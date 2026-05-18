@@ -6,4 +6,4 @@ faiss-cpu==1.13.0
 qdrant-client==1.16.1
 pymongo==4.17.0
 python-dotenv==1.2.1
-numpy==2.0.2
+numpy==2.1.0
