@@ -124,7 +124,7 @@ if mongo_count != qdrant_count:
 
         payload = {
 
-            "id": str(doc.get("_id")),
+            "id": str(doc.get("id")),
 
             "title": doc.get("title", ""),
 
@@ -295,7 +295,7 @@ def add_document(new_doc):
         collection_name=COLLECTION_NAME,
         points=[
             {
-                "id": int(new_doc.get("id")),
+                "id": len(faiss_id_map),
                 "vector": embedding,
                 "payload": {
                     "id": new_doc.get("id"),
