@@ -14,6 +14,8 @@ def home():
 @app.post("/search")
 def search(proposal: ProposalInput):
 
+    print(proposal.dict())
+
     # Run similarity search
     results = search_similar({
         "title": proposal.title,

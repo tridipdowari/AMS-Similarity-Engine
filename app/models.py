@@ -3,6 +3,7 @@ from typing import List
 
 
 class ProposalInput(BaseModel):
+    id: str
     title: str
     discipline: str
     introduction: str

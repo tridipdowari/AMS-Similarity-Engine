@@ -197,7 +197,7 @@ if len(stored_points) > 0:
 
     print("Existing vectors loaded into FAISS.")
 
-def search_similar(query_data, top_k: int = 3):
+def search_similar(query_data, top_k: int = 5):
 
     combined_query = f"""
     TITLE:
@@ -244,7 +244,7 @@ def search_similar(query_data, top_k: int = 3):
         elif similarity_score >= 50:
             status = "MEDIUM"
 
-        else:
+        else: 
             status = "LOW"
 
         results.append({
